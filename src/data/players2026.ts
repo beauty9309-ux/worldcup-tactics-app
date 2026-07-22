@@ -59,8 +59,11 @@ function build(teamId: string, list: RawPlayer[]): Player[] {
   }));
 }
 
-// Names, shirt numbers, positions and on-pitch presence at the scenario moments are drawn from
-// real 2026 World Cup records (Naver Sports match data, openfootball/worldcup.json squad lists).
+// Names, shirt numbers, positions are the real confirmed 2026 World Cup 26-man squad
+// (source: openfootball/worldcup.json). On-pitch presence at the exact scenario moments
+// (who started, who was subbed on/off) is drawn from Naver Sports match data — see
+// `koreaSquadIds` per scenario in scenarios.ts for which subset is treated as "confirmed to
+// have appeared in that specific match" vs. "real squad member, available as a bench option".
 // Ability ratings (overall/pace/shooting/etc.) are estimated gameplay figures, not official data.
 export const koreaPlayers = build("kor", [
   { id: "son", name: "손흥민", number: 7, position: "CAM", overall: 89 },
@@ -69,16 +72,26 @@ export const koreaPlayers = build("kor", [
   { id: "hwangheechan", name: "황희찬", number: 11, position: "CAM", overall: 83 },
   { id: "hwanginbeom", name: "황인범", number: 6, position: "CM", overall: 82 },
   { id: "leejaesung", name: "이재성", number: 10, position: "CAM", overall: 81 },
+  { id: "chogyusung", name: "조규성", number: 9, position: "ST", overall: 79 },
   { id: "kimseunggyu", name: "김승규", number: 1, position: "GK", overall: 79 },
   { id: "seolyoungwoo", name: "설영우", number: 22, position: "LM", overall: 79 },
+  { id: "yanghyunjun", name: "양현준", number: 20, position: "LM", overall: 78 },
+  { id: "johyunwoo", name: "조현우", number: 21, position: "GK", overall: 78 },
   { id: "baekseungho", name: "백승호", number: 8, position: "CM", overall: 78 },
   { id: "castrop", name: "옌스 카스트로프", number: 23, position: "CM", overall: 78 },
   { id: "ohhyeongyu", name: "오현규", number: 18, position: "ST", overall: 77 },
   { id: "leehanbeom", name: "이한범", number: 2, position: "CB", overall: 76 },
   { id: "kimmoonhwan", name: "김문환", number: 15, position: "RM", overall: 76 },
+  { id: "baejunho", name: "배준호", number: 17, position: "RM", overall: 76 },
   { id: "kimjingyu", name: "김진규", number: 24, position: "CM", overall: 75 },
   { id: "leegihyeok", name: "이기혁", number: 3, position: "CB", overall: 75 },
+  { id: "songbumkeun", name: "송범근", number: 12, position: "GK", overall: 75 },
+  { id: "eomjisung", name: "엄지성", number: 25, position: "RW", overall: 75 },
   { id: "leetaeseok", name: "이태석", number: 13, position: "CM", overall: 74 },
+  { id: "kimtaehyun", name: "김태현", number: 5, position: "CB", overall: 74 },
+  { id: "parkjinseob", name: "박진섭", number: 16, position: "LB", overall: 74 },
+  { id: "leedonggyeong", name: "이동경", number: 26, position: "CM", overall: 74 },
+  { id: "chowije", name: "조위제", number: 14, position: "CB", overall: 73 },
 ]);
 
 export const mexicoPlayers = build("mex", [

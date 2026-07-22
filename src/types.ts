@@ -64,9 +64,9 @@ export interface CrisisScenario {
   stadium: string;
   koreaTeam: Team;
   opponentTeam: Team;
-  /** Player ids confirmed to have appeared in this specific match (starting XI plus any
-   * confirmed substitutes-off) — the only players offered as bench/tactical options, so we
-   * never imply a real player featured in a match without a verified source for it. */
+  /** Player ids offered as bench/tactical options for this scenario — real, verified 2026
+   * World Cup squad members (not necessarily confirmed to have appeared in this exact match;
+   * `koreaLineup` below is what's confirmed for the match itself). */
   koreaSquadIds: string[];
   concedeMinute: number;
   scorerName: string;
