@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 위기의 순간, 내가 감독이라면?
 
-## Getting Started
+**2026 월드컵에서 대한민국이 실제로 실점한 그 순간으로 돌아가, 감독이 되어 전술을 바꿔 역전을 노리는 인터랙티브 웹서비스**
 
-First, run the development server:
+> DACON/DAKER 월간 해커톤 "내가 축구 감독이라면 - 월드컵 전술 웹서비스 챌린지" 출품작
+> 팀명: 월드콘 · 참가자: 최경철 (기획 및 개발)
+
+---
+
+## 어떤 서비스인가요
+
+2026 FIFA 월드컵 조별예선에서 대한민국은 멕시코전 후반 5분, 남아공전 후반 18분에 각각
+실점하며 0:1로 끌려가다 결국 패했습니다. 두 경기 모두 "우리가 질 팀이 아니었는데 졌다"는
+아쉬움이 남았던 순간입니다.
+
+이 서비스는 그 실점 직후, **실제 그 순간의 라인업 그대로**를 불러와 감독이 되어 남은 시간의
+전술을 다시 짜고 역전을 시도해보는 시뮬레이션입니다. AI 코치가 먼저 전술을 추천하고,
+사용자는 이를 따르거나 자신의 판단을 믿을 수 있습니다. 결과는 승리·무승부·패배 중
+하나로, 전술이 좋아도 반드시 역전한다는 보장은 없습니다.
+
+## 핵심 기능
+
+- **실제 위기 시나리오 2종** — 멕시코전 / 남아공전, 실점 직후 그 순간의 실제 포메이션·라인업·하프타임 교체까지 반영
+- **60초 결정 타이머** — 시간 안에 결정하지 않으면 현재 상태로 자동 확정
+- **AI 코치** — 캐릭터 대사로 상황을 브리핑하고 추천 포메이션 제시, "AI 추천 적용" 버튼으로 즉시 반영 가능
+- **AI 추천 vs 감독의 직감** — 사용자가 AI 추천을 따랐는지, 다르게 판단했는지에 따라 결과 화면에서 두 선택을 비교
+- **전술보드** — 포메이션 6종 변경, 데스크톱 드래그앤드롭 + 모바일 탭-투-스왑으로 선수 교체 (26인 실제 국가대표 스쿼드 전원이 교체 후보)
+- **선수 스탯 비교** — 임의의 두 선수를 골라 스피드/슈팅/패스/드리블/수비/피지컬 비교
+- **역전 승리 확률 + 결과 시뮬레이션** — 포아송 분포 기반 규칙 엔진으로 승/무/패 확률 계산, 실제 결과도 그 확률에 따라 랜덤 산출
+- **수치 기반 설명** — "실제 경기 대비 역전 확률이 14%→17%로 올랐습니다" 처럼 왜 그 결과가 나왔는지 구체적으로 설명
+
+## 데이터 출처 (사실관계 vs 추정치)
+
+| 구분 | 내용 | 출처 |
+|---|---|---|
+| **실제 데이터** | 대회/날짜/경기장, 최종 스코어, 득점자·득점 시각, 실점 순간의 실제 라인업·포메이션·하프타임 교체, 선수 실명·실제 등번호 | 네이버 스포츠(Naver Sports) 경기 기록 API + [`openfootball/worldcup.json`](https://github.com/openfootball/worldcup.json)(오픈소스) 상호 교차검증 |
+| **추정 데이터** | 팀/선수 능력치(공격력·수비력·스피드·슈팅 등) | 게임 디자인상의 추정치. 공식 레이팅(EA SPORTS FC 등)은 사용하지 않음 |
+| **AI 판단 엔진** | 규칙 기반(rule-based) 수식 — 학습된 머신러닝 모델 아님 | 자체 구현 (`src/lib/crisisEngine.ts`) |
+
+실존 선수·실제 경기 데이터를 다루는 프로젝트인 만큼, **검증되지 않은 사실은 지어내지 않는다**는
+원칙으로 만들었습니다. 등번호가 없는 항목은 표시하지 않고, 각 시나리오의 실제 선발/교체
+라인업은 반드시 두 개 이상의 출처로 교차검증했습니다.
+
+## 기술 스택
+
+- **Next.js 16** (App Router) + **TypeScript** + **Tailwind CSS**
+- 별도 백엔드·데이터베이스 없음 — 모든 데이터는 정적 TypeScript 파일로 내장
+- 외부 API 키 불필요 (심사자가 별도 인증 없이 바로 확인 가능)
+
+## 로컬 실행 방법
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000) 접속. 회원가입, 설치, API 키 모두 필요 없습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+프로덕션 빌드 확인:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## 프로젝트 구조
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├─ app/                     # 페이지 (App Router)
+├─ components/
+│  ├─ ScenarioSelect.tsx     # 위기 상황 선택 화면
+│  ├─ CrisisBoard.tsx        # 위기 대응 보드 (타이머 + AI 코치 + 전술보드)
+│  ├─ CrisisResultPanel.tsx  # 결과 화면
+│  ├─ PitchBoard.tsx         # 포메이션 pitch UI (드래그/탭 교체)
+│  ├─ AICoachBubble.tsx      # AI 코치 대사 UI
+│  ├─ DecisionTimer.tsx      # 60초 카운트다운
+│  └─ PlayerStatCompare.tsx  # 선수 스탯 비교 막대그래프
+├─ data/
+│  ├─ scenarios.ts           # 실제 위기 시나리오 2종
+│  ├─ players2026.ts         # 실제 2026 월드컵 대한민국/멕시코/남아공 선수단
+│  ├─ teams2026.ts           # 팀별 능력치
+│  └─ formations.ts          # 포메이션 6종 좌표
+├─ lib/
+│  └─ crisisEngine.ts        # 역전 승/무/패 확률 엔진 (Poisson 기반)
+└─ types.ts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+.claude/skills/naver-sports-fetch/  # 네이버 스포츠에서 실제 경기 데이터를 가져오는 방법 (신규 시나리오 추가용)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 기획서
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+프로젝트 기획 의도, 화면 구성, 인터랙션 명세, 데이터 활용 방식은 [`기획서.md`](./기획서.md)를 참고하세요.
