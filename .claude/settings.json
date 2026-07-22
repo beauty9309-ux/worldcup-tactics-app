@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(chromium-cli --help)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx --yes playwright install chromium --with-deps)",
+      "Bash(npx --yes playwright install chromium)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npm ls *)",
+      "Bash(node --experimental-vm-modules -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node smoke.mjs)",
+      "WebFetch(domain:m.sports.naver.com)"
+    ]
+  }
+}
