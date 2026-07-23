@@ -29,8 +29,8 @@ export default function DecisionTimer({
     <div
       className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-lg font-bold tabular-nums ${
         urgent
-          ? "border-red-400 bg-red-50 text-red-600 dark:border-red-700 dark:bg-red-950 dark:text-red-400"
-          : "border-zinc-300 bg-zinc-50 text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          ? "border-accent bg-accent/[0.08] text-accent"
+          : "border-rule bg-paper-panel text-ink"
       }`}
     >
       <span>⏱</span>

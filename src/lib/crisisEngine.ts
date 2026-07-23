@@ -31,6 +31,15 @@ function clamp(v: number, min: number, max: number) {
   return Math.max(min, Math.min(max, v));
 }
 
+// Korean subject particle (이/가) depends on whether the name's last syllable has a batchim
+// (final consonant) — team names here are user-facing (opponent name), so pick the right one
+// instead of leaving a literal "이(가)" in the sentence.
+function withSubjectParticle(name: string): string {
+  const lastCode = name.charCodeAt(name.length - 1);
+  const hasBatchim = lastCode >= 0xac00 && lastCode <= 0xd7a3 && (lastCode - 0xac00) % 28 !== 0;
+  return `${name}${hasBatchim ? "이" : "가"}`;
+}
+
 export function remapLineupToFormation(
   currentLineup: Record<number, string>,
   newFormationId: string
@@ -129,6 +138,19 @@ function winProbability(scenario: CrisisScenario, formationId: string): number {
   return clamp(Math.round(win), 3, 85);
 }
 
+// One-line explanation of what changing from one formation to another actually trades off —
+// used on the result screen to justify the "이 포메이션으로 재도전" advice instead of just
+// asserting a formation is better.
+export function formationShiftHint(fromFormationId: string, toFormationId: string): string {
+  const fromMod = FORMATION_MODS[fromFormationId] ?? { attack: 0, midfield: 0, defense: 0 };
+  const toMod = FORMATION_MODS[toFormationId] ?? { attack: 0, midfield: 0, defense: 0 };
+  const attackDiff = toMod.attack - fromMod.attack;
+  const defenseDiff = toMod.defense - fromMod.defense;
+  if (attackDiff > 0 && defenseDiff <= 0) return "공격을 더 끌어올리는 대신 수비 부담을 감수하는 쪽";
+  if (defenseDiff > 0 && attackDiff <= 0) return "수비를 더 단단히 하는 대신 공격 숫자를 줄이는 쪽";
+  return "공격과 수비 균형을 다르게 가져가는 쪽";
+}
+
 // The AI coach's suggestion: whichever available formation maximizes the comeback-win
 // probability for this scenario. Compared against the manager's (user's) actual choice afterward.
 export function getAIRecommendation(scenario: CrisisScenario): AIRecommendation {
@@ -212,8 +234,20 @@ export function runCrisisSimulation(
 
   const baselineWinPct = winProbability(scenario, scenario.koreaFormationId);
   const winDiff = winPct - baselineWinPct;
+  const aiRecommendation = getAIRecommendation(scenario);
+  const followedAI = koreaFormationId === aiRecommendation.formationId;
 
   const reasons: string[] = [];
+
+  // Lead with the concrete cause of THIS run's scoreline (the random draw), before the
+  // probability talk — that's what a player is actually asking when they see WIN/DRAW/LOSS
+  // and don't recognize why, since the same formation can land differently each retry.
+  reasons.push(
+    extraKoreaGoals === extraOppGoals
+      ? `이번 시뮬레이션에서는 대한민국과 ${opp.name} 모두 추가로 ${extraKoreaGoals}골씩 넣었습니다.`
+      : `이번 시뮬레이션에서는 대한민국이 추가로 ${extraKoreaGoals}골, ${withSubjectParticle(opp.name)} 추가로 ${extraOppGoals}골을 넣어 최종 스코어가 갈렸습니다.`
+  );
+
   if (winDiff > 0) {
     reasons.push(
       `실제 경기(${scenario.koreaFormationId}) 대비 역전 승리 확률이 ${baselineWinPct}%→${winPct}%로 ${winDiff}%p 올랐습니다.`
@@ -237,9 +271,6 @@ export function runCrisisSimulation(
     );
   }
   if (mod.midfield > 0) reasons.push(`중원 숫자 우위로 공수 전환을 더 유리하게 가져갈 수 있습니다.`);
-
-  const aiRecommendation = getAIRecommendation(scenario);
-  const followedAI = koreaFormationId === aiRecommendation.formationId;
 
   return {
     winProbability: winPct,

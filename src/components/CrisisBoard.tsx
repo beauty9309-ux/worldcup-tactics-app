@@ -54,20 +54,20 @@ export default function CrisisBoard({
           type="button"
           onClick={() => handleFormationChange(aiRecommendation.formationId)}
           disabled={formationId === aiRecommendation.formationId}
-          className="rounded-lg border border-amber-400 bg-white px-3 py-1.5 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-amber-700 dark:bg-zinc-900 dark:text-amber-300"
+          className="rounded-md bg-ink px-3 py-1.5 text-xs font-semibold text-paper transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {formationId === aiRecommendation.formationId ? "AI 추천 적용됨" : "AI 추천 적용하기"}
         </button>
       </AICoachBubble>
 
       <div>
-        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        <label className="mb-1 block text-sm font-semibold text-ink">
           대한민국 포메이션
         </label>
         <select
           value={formationId}
           onChange={(e) => handleFormationChange(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="w-full rounded-lg border border-rule bg-paper px-3 py-2 text-sm text-ink"
         >
           {AVAILABLE_FORMATIONS.map((id) => {
             const f = formations.find((f) => f.id === id)!;
@@ -82,20 +82,20 @@ export default function CrisisBoard({
             );
           })}
         </select>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-xs text-ink-muted">
           {formations.find((f) => f.id === formationId)?.description}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <h4 className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          <h4 className="mb-2 text-sm font-semibold text-ink">
             대한민국 — 탭하거나 드래그로 선수 교체
           </h4>
           <PitchBoard formationId={formationId} lineup={lineup} roster={koreaRoster} onChange={onLineupChange} />
         </div>
         <div>
-          <h4 className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          <h4 className="mb-2 text-sm font-semibold text-ink">
             {scenario.opponentTeam.name} (실제 선발, 고정)
           </h4>
           <PitchBoard
@@ -112,7 +112,7 @@ export default function CrisisBoard({
       <button
         type="button"
         onClick={() => onRun(formationId, lineup)}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+        className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
       >
         이 전술로 결과 산출하기
       </button>

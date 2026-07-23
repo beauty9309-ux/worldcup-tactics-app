@@ -1,67 +1,79 @@
 @import "tailwindcss";
 
+/* 매치데이 프로그램 톤 — 라이트(종이) 기본, 다크는 "야간판" 별도 설계 (단순 반전 아님) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #E9EDEC;
+  --paper-panel: #E1E6E3;
+  --ink: #17181C;
+  --ink-muted: #5B6169;
+  --accent: #C8102E;
+  --rule: #C7CCC6;
+  --good: #2F6E4E;
+  --warn: #B5842A;
+  --critical: var(--accent);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-panel: var(--paper-panel);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-rule: var(--rule);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-critical: var(--critical);
+  --font-display: var(--font-song-myung);
+  --font-body: var(--font-noto-serif-kr);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:where(:not([data-theme="light"])) {
+    --paper: #17181A;
+    --paper-panel: #1F2123;
+    --ink: #ECEAE3;
+    --ink-muted: #9A9D96;
+    --accent: #FF4759;
+    --rule: #333530;
+    --good: #4FAE82;
+    --warn: #D9A542;
+    --background: var(--paper);
+    --foreground: var(--ink);
   }
+}
+:root[data-theme="dark"] {
+  --paper: #17181A;
+  --paper-panel: #1F2123;
+  --ink: #ECEAE3;
+  --ink-muted: #9A9D96;
+  --accent: #FF4759;
+  --rule: #333530;
+  --good: #4FAE82;
+  --warn: #D9A542;
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), "Noto Serif KR", serif;
 }
 
 .viz-root {
-  color-scheme: light;
-  --surface-1: #fcfcfb;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --gridline: #e1e0d9;
-  --series-1: #2a78d6;
-  --series-2: #eb6834;
-  --status-good: #0ca30c;
-  --status-warning: #fab219;
-  --status-critical: #d03b3b;
-}
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) .viz-root {
-    color-scheme: dark;
-    --surface-1: #1a1a19;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --gridline: #2c2c2a;
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --status-good: #0ca30c;
-    --status-warning: #fab219;
-    --status-critical: #e66767;
-  }
-}
-:root[data-theme="dark"] .viz-root {
-  color-scheme: dark;
-  --surface-1: #1a1a19;
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
-  --text-muted: #898781;
-  --gridline: #2c2c2a;
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --status-good: #0ca30c;
-  --status-critical: #e66767;
+  --surface-1: var(--paper-panel);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-muted);
+  --text-muted: var(--ink-muted);
+  --gridline: var(--rule);
+  --series-1: var(--accent);
+  --series-2: var(--good);
+  --status-good: var(--good);
+  --status-warning: var(--warn);
+  --status-critical: var(--critical);
 }

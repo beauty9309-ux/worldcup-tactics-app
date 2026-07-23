@@ -1,5 +1,6 @@
 import type { CrisisResult, CrisisScenario, MatchOutcome } from "@/types";
 import { formations } from "@/data/formations";
+import { formationShiftHint } from "@/lib/crisisEngine";
 
 const OUTCOME_LABEL: Record<MatchOutcome, string> = {
   WIN: "역전승!",
@@ -18,11 +19,13 @@ export default function CrisisResultPanel({
   result,
   onRerun,
   onBackToBoard,
+  onApplyAIAndRerun,
 }: {
   scenario: CrisisScenario;
   result: CrisisResult;
   onRerun: () => void;
   onBackToBoard: () => void;
+  onApplyAIAndRerun: () => void;
 }) {
   const chosenName = formations.find((f) => f.id === result.chosenFormationId)?.name ?? result.chosenFormationId;
   const aiName = formations.find((f) => f.id === result.aiRecommendation.formationId)?.name ?? result.aiRecommendation.formationId;
@@ -35,15 +38,40 @@ export default function CrisisResultPanel({
     ? `AI 추천(${aiName})을 따랐다면 역전 확률이 ${Math.abs(diff)}%p 더 높았을 것입니다.`
     : "감독님의 선택과 AI 추천의 역전 확률이 같았습니다.";
 
+  // Only push a "do better next time" nudge when this attempt didn't already win — a WIN
+  // needs no advice, and repeating it there would just be noise.
+  const needsAdvice = result.outcome !== "WIN";
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-        <p className="text-xs font-semibold uppercase tracking-wide opacity-70">AI 코치의 평가</p>
+      <div className="border-l-[3px] border-accent bg-paper-panel py-3 pl-4 pr-4 text-sm text-ink">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">AI 코치의 평가</p>
         <p className="mt-1 font-semibold">{verdict}</p>
-        <p className="mt-1 text-xs opacity-80">
+        <p className="mt-1 text-xs text-ink-muted">
           AI 추천: {aiName} (역전 확률 {result.aiRecommendation.winProbability}%) · 감독님의 선택: {chosenName} (역전 확률{" "}
           {result.winProbability}%)
         </p>
+        {needsAdvice && !result.followedAI && (
+          <div className="mt-3 border-t border-rule pt-3">
+            <p className="text-xs text-ink-muted">
+              {formationShiftHint(result.chosenFormationId, result.aiRecommendation.formationId)}으로 승부를 보면
+              역전 확률이 {result.winProbability}%→{result.aiRecommendation.winProbability}%로 달라집니다.
+            </p>
+            <button
+              type="button"
+              onClick={onApplyAIAndRerun}
+              className="mt-2 rounded-md bg-ink px-3 py-1.5 text-xs font-semibold text-paper transition-opacity hover:opacity-90"
+            >
+              AI 추천({aiName})으로 바로 재도전
+            </button>
+          </div>
+        )}
+        {needsAdvice && result.followedAI && (
+          <p className="mt-3 border-t border-rule pt-3 text-xs text-ink-muted">
+            이미 이 상황에서 낼 수 있는 최선의 역전 확률({result.winProbability}%)이었습니다. 확률은 확률일 뿐 — 아래
+            &ldquo;같은 전술로 다시 시뮬레이션&rdquo;으로 다시 도전하면 다른 결과가 나올 수 있습니다.
+          </p>
+        )}
       </div>
 
       <div className="viz-root rounded-xl border p-4" style={{ borderColor: "var(--gridline)", background: "var(--surface-1)" }}>
@@ -82,24 +110,24 @@ export default function CrisisResultPanel({
         </div>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <h3 className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">전술 변경 분석</h3>
-        <ul className="flex flex-col gap-1.5 text-sm text-zinc-700 dark:text-zinc-300">
+      <div className="rounded-lg border border-rule p-4">
+        <h3 className="mb-2 text-sm font-semibold text-ink">전술 변경 분석</h3>
+        <ul className="flex flex-col gap-1.5 text-sm text-ink">
           {result.reasons.map((r, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-blue-500">•</span>
+              <span className="text-accent">•</span>
               <span>{r}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <h3 className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">경기 타임라인</h3>
-        <ul className="flex flex-col gap-1.5 text-sm text-zinc-700 dark:text-zinc-300">
+      <div className="rounded-lg border border-rule p-4">
+        <h3 className="mb-2 text-sm font-semibold text-ink">경기 타임라인</h3>
+        <ul className="flex flex-col gap-1.5 text-sm text-ink">
           {result.timeline.map((t, i) => (
             <li key={i} className="flex gap-2">
-              <span className="w-10 shrink-0 tabular-nums text-zinc-400">{t.minute}&apos;</span>
+              <span className="w-10 shrink-0 tabular-nums text-ink-muted">{t.minute}&apos;</span>
               <span>{t.text}</span>
             </li>
           ))}
@@ -110,14 +138,14 @@ export default function CrisisResultPanel({
         <button
           type="button"
           onClick={onRerun}
-          className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+          className="flex-1 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           같은 전술로 다시 시뮬레이션
         </button>
         <button
           type="button"
           onClick={onBackToBoard}
-          className="flex-1 rounded-lg border border-zinc-300 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+          className="flex-1 rounded-lg border border-rule px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-paper-panel"
         >
           전술 다시 짜기
         </button>

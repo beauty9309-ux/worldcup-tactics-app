@@ -100,8 +100,9 @@ export default function PitchBoard({
           const player = lineup[idx] ? playerMap.get(lineup[idx]) : undefined;
           const isSelected = selected?.type === "slot" && selected.idx === idx;
           return (
-            <div
+            <button
               key={idx}
+              type="button"
               draggable={editable && !!player}
               onDragStart={(e) => {
                 e.dataTransfer.setData("text/plain", `slot:${idx}`);
@@ -116,8 +117,8 @@ export default function PitchBoard({
               style={{ left: `${slot.x}%`, bottom: `${slot.y}%` }}
             >
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-zinc-900 shadow ${
-                  isSelected ? "ring-2 ring-blue-500 ring-offset-1" : ""
+                className={`flex h-8 w-8 items-center justify-center rounded-full bg-paper text-xs font-bold text-ink shadow ${
+                  isSelected ? "ring-2 ring-accent ring-offset-1" : ""
                 }`}
               >
                 {player ? player.number : slot.label}
@@ -125,33 +126,32 @@ export default function PitchBoard({
               <div className="max-w-16 truncate rounded bg-black/60 px-1 text-[10px] leading-tight text-white">
                 {player ? player.name : slot.label}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
 
       {editable && bench.length > 0 && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+          <h4 className="mb-1 text-xs font-semibold text-ink-muted">
             벤치 (탭하거나 드래그해서 선수 교체)
           </h4>
           <div className="flex flex-wrap gap-1.5">
             {bench.map((p) => {
               const isSelected = selected?.type === "bench" && selected.playerId === p.id;
               return (
-                <div
+                <button
                   key={p.id}
+                  type="button"
                   draggable
                   onDragStart={(e) => e.dataTransfer.setData("text/plain", `bench:${p.id}`)}
                   onClick={() => handleTap({ type: "bench", playerId: p.id })}
-                  className={`cursor-pointer rounded-md border bg-white px-2 py-1 text-xs text-zinc-700 shadow-sm active:cursor-grabbing dark:bg-zinc-900 dark:text-zinc-300 ${
-                    isSelected
-                      ? "border-blue-500 ring-2 ring-blue-500"
-                      : "border-zinc-200 dark:border-zinc-700"
+                  className={`cursor-pointer rounded-md border bg-paper px-2 py-1 text-xs text-ink shadow-sm active:cursor-grabbing ${
+                    isSelected ? "border-accent ring-2 ring-accent" : "border-rule"
                   }`}
                 >
-                  #{p.number} {p.name} <span className="text-zinc-400">({p.position})</span>
-                </div>
+                  #{p.number} {p.name} <span className="text-ink-muted">({p.position})</span>
+                </button>
               );
             })}
           </div>
